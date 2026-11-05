@@ -36,4 +36,4 @@ snapshot note in AGENTS.md.
 
 ## License
 
-Apache-2.0, see [LICENSE](../../LICENSE).
+The Java sources in this folder are EPL-2.0, as stated in each file's header; they come from Data In Motion's accounting pilot. Whether they move to the repository's Apache-2.0 license ([LICENSE](../../LICENSE)) is still to be agreed with Data In Motion. Build files and the Gradle wrapper are Apache-2.0.
