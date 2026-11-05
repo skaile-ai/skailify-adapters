@@ -1,0 +1,1 @@
+# skailify-adapters
