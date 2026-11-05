@@ -1,4 +1,5 @@
-# The manifest by which Skaile discovers an app. Generic over the app: it plugs in through
+# A manifest describing an app for Skaile (the platform does not import it yet,
+# skaile-ai/platform#9034). Generic over the app: it plugs in through
 # configuration and the skailify EAnnotation of its EPackage.
 Bundle-Name: Skailify - Manifest
 Bundle-Description: Serves /.well-known/skailify.json: the app, its embed URL, MCP endpoint, issuers \

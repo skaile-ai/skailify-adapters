@@ -12,6 +12,20 @@ backend reachable for Skaile agents: generic model tools over MCP, an OAuth reso
 for Skaile's per-user MCP access, and the `/.well-known/skailify.json` manifest. Do every step,
 run every check, and report what you could not verify.
 
+**Writes and consent: read this before you expose anything.** `create`, `update` and `delete` are
+MCP tools. The Skaile platform does **not** apply its approval cards or any user consent to MCP
+calls: an agent with a write token changes data directly, as the user. The `approval` and
+`effectClass` declarations below (Step 3, Step 6) are not enforced on MCP calls. So, for now:
+
+- Expose only the read-only endpoint (Step 4) to agents.
+- Put writes that need consent through `app.*` actions of the UI adapter (`frontend/vue-tsm` in
+  this repository), where the platform's approval applies.
+- Keep the full endpoint (with the write tools) for tests or trusted automation only, and say so
+  in the app's configuration.
+
+The platform design treats MCP as the read and query channel. That may change or remove the
+write tools here.
+
 ## What it does
 
 | Bundle | What it gives the app |
@@ -20,8 +34,8 @@ run every check, and report what you could not verify.
 | `de.dim.skailify.emf.tools` | `SkailifyEmfTools` (factory PID): the tools `describe_model`, `query`, `get`, `create`, `update`, `delete` over one EPackage and one Fennec `Repository`. JSON in and out, filters as Fennec queries, OCL/Diagnostician validation with structured errors, unique attributes, read and write scopes. |
 | `de.dim.skailify.manifest` | `SkailifyManifest` (factory PID): serves `/.well-known/skailify.json`: the app, its embed URL, the MCP endpoint, issuers and a grant catalogue built from the tools and the model's annotations. |
 
-The test-only bundles (`…emf.example.model`, `…emf.testing.filerepository`, `…emf.tests`) are
-not part of the adapter. Do not deploy them.
+The test-only bundles (`de.dim.skailify.example.model`, `de.dim.skailify.testing.filerepository`,
+`de.dim.skailify.tests`) are not part of the adapter. Do not deploy them.
 
 ## Prerequisites
 
@@ -86,12 +100,16 @@ feature:
 | `effectClass` | package, class | `routine`, `external` or `privileged` (manifest; package = default) |
 | `approval` | package, class | `none`, `optional` or `required` (manifest; package default `required`) |
 
+`grant`, `effectClass` and `approval` only go into the manifest. They describe what the app wants
+the platform to do; nothing enforces them on an MCP call today.
+
 Hide secrets (credentials, bank details, internal notes) with `expose=false`. Check with
 `describe_model` that they are gone.
 
-## Step 4: a read-only endpoint
+## Step 4: a read-only endpoint (the one to give agents)
 
-A second tool set over the same model with only the read tools, on its own endpoint:
+A second tool set over the same model with only the read tools, on its own endpoint. This is the
+endpoint to register for Skaile agents for now (see "Writes and consent" above):
 
 ```json
 "SkailifyToolProvider~app-read": {
@@ -176,6 +194,10 @@ the protected resource metadata URL, and one grant per tool (kind, effect class,
 scope; for change tools one entry per visible class with a `grant`). `actions` adds the app's
 `app.*` capabilities of the UI or a server-side connection. The format is a draft (`0.1-draft`).
 
+The platform does not import this manifest yet (skaile-ai/platform#9034): discovery through it
+is future-facing, and its `approval` and `effectClass` values change nothing today. Register the
+MCP endpoint in Skaile by hand.
+
 ## Step 7: verify
 
 1. `./gradlew build` here: unit tests and the OSGi integration tests
@@ -193,11 +215,12 @@ scope; for change tools one entry per visible class with a `grant`). `actions` a
 
 ## Known limits
 
-- **Snapshots.** Fennec comes as snapshots from Maven Central's snapshot repository
-  (`cnf/ext/central.mvn`). A snapshot can change under a build: on 2026-11-05 a Data Atlas
-  snapshot moved types into a new artifact and broke code generation of models extending them
-  overnight. Snapshots also expire after a while. Pin what you depend on, or move to releases
-  when they exist; when a clean build fails, compare the resolved snapshot timestamps first.
+- **Snapshots.** Most Fennec artifacts have no release yet. This workspace pins them to exact
+  snapshot builds (`cnf/ext/fennec-pinned.xml`; the list and the reasons are in README.md,
+  "Dependencies"). Do the same in the app's workspace: an open `-SNAPSHOT` can change under a
+  build (on 2026-11-05 a Data Atlas snapshot moved types into a new artifact and broke code
+  generation of models extending them overnight). Pinned builds expire when Central deletes old
+  snapshots; then move the pins, or move to releases when they exist.
 - **Private egress (skaile-ai/platform#9035).** Skaile reaches the MCP endpoint and the
   manifest from its own network: an app reachable only inside a private network is not
   reachable for Skaile agents.
