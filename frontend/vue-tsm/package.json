@@ -1,0 +1,48 @@
+{
+  "name": "@skaile/skailify-vue-tsm",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "Apache-2.0",
+  "description": "Skailify adapter for Vue 3 apps on the tsm module runtime: makes their views, lists and UIModel forms agent-controllable over the Skaile app channel",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    }
+  },
+  "files": ["src", "README.md", "AGENTS.md"],
+  "scripts": {
+    "test": "vitest run",
+    "type-check": "vue-tsc --noEmit -p ."
+  },
+  "peerDependencies": {
+    "@eclipse-daanse/tsm": ">=0.1.0-next.1",
+    "@emfts/core": ">=0.3.0-next.4",
+    "@emfts/uimodel-composer": ">=0.0.2-next.1",
+    "@skaile/workspaces": "^7.18.1",
+    "vue": "^3.5.0",
+    "vue-router": "^5.0.0",
+    "zod": "^4.4.0"
+  },
+  "peerDependenciesMeta": {
+    "@eclipse-daanse/tsm": { "optional": true }
+  },
+  "devDependencies": {
+    "@eclipse-daanse/tsm": "0.1.0-next.1",
+    "@emfts/core": "0.3.0-next.4",
+    "@emfts/uimodel-composer": "0.0.2-next.1",
+    "@skaile/workspaces": "7.18.1",
+    "typescript": "~5.9.2",
+    "vitest": "^3.2.7",
+    "vue": "^3.5.13",
+    "vue-router": "^5.0.1",
+    "vue-tsc": "^3.2.2",
+    "zod": "^4.4.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
