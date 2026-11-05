@@ -39,6 +39,11 @@ registration is a no-op in cost.
 
 All of these are peer dependencies: install them in the app, not in this package.
 
+`@emfts/core`, `@emfts/uimodel-composer` and `@eclipse-daanse/tsm` have only prereleases on npm
+so far. Their peer ranges are tilde ranges on the tested prerelease (`~0.3.0-next.4`,
+`~0.0.2-next.1`, `~0.1.0-next.1`): later prereleases and patch releases of that minor version
+match, the next minor version does not. Move to caret ranges once they are stable 1.x.
+
 ## Step 1: install
 
 Add the package (from this repository, until it is published) and its peers to the app. In an

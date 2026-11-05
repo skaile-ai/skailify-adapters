@@ -19,9 +19,9 @@
     "type-check": "vue-tsc --noEmit -p ."
   },
   "peerDependencies": {
-    "@eclipse-daanse/tsm": ">=0.1.0-next.1",
-    "@emfts/core": ">=0.3.0-next.4",
-    "@emfts/uimodel-composer": ">=0.0.2-next.1",
+    "@eclipse-daanse/tsm": "~0.1.0-next.1",
+    "@emfts/core": "~0.3.0-next.4",
+    "@emfts/uimodel-composer": "~0.0.2-next.1",
     "@skaile/workspaces": "^7.18.1",
     "vue": "^3.5.0",
     "vue-router": "^5.0.0",
