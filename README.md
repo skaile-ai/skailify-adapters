@@ -12,4 +12,4 @@ platform is `@skaile/workspaces/app-sdk`.
 
 ## License
 
-Apache-2.0, see [LICENSE](LICENSE).
+Apache-2.0, see [LICENSE](LICENSE), unless a folder says otherwise: the Java sources in `backend/emf-mcp` are EPL-2.0 for now (see its README).
