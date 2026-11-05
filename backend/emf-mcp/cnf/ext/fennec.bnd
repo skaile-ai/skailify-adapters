@@ -1,0 +1,26 @@
+# Eclipse Fennec workspace fragment (Gradle), modelled on eclipse-fennec/emf.odata.
+
+-library: \
+	fennec,\
+	fennecTest,\
+	fennecEMF,\
+	fennecPersistence,\
+	fennecMCP
+
+base-version: 0.1.0
+javac.source: 21
+javac.target: 21
+-require-bnd: "(version>=7.2.1)"
+-jpms-module-info:
+Bundle-License: Apache-2.0;link="https://www.apache.org/licenses/LICENSE-2.0"
+
+# Fennec comes as snapshots from Maven Central's snapshot repository. A snapshot can change under
+# a build at any time (see AGENTS.md, "Known limits").
+-plugin.5.Central: \
+	aQute.bnd.repository.maven.provider.MavenBndRepository; \
+		snapshotUrl="https://central.sonatype.com/repository/maven-snapshots/"; \
+		releaseUrl=https://repo.maven.apache.org/maven2/; \
+		index=${.}/central.mvn; \
+		readOnly=true; \
+		poll.time=-1; \
+		name="Central"

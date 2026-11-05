@@ -1,0 +1,35 @@
+name: emf-mcp
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/emf-mcp/**'
+      - '.github/workflows/emf-mcp.yml'
+  pull_request:
+    paths:
+      - 'backend/emf-mcp/**'
+      - '.github/workflows/emf-mcp.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/emf-mcp
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew build
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: emf-mcp-test-reports
+          path: backend/emf-mcp/*/generated/test-reports/

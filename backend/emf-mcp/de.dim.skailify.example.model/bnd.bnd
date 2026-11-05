@@ -1,0 +1,21 @@
+# TEST SUPPORT ONLY, not part of the adapter: a small example model the integration tests drive the
+# tools, the MCP server and the manifest with. Generated in ecore-only mode (the genmodel is derived).
+Bundle-Name: Skailify EMF - Example Model
+Bundle-Description: A small shop model (customers, orders, a hidden secret) with skailify annotations
+
+-library: enableEMF
+
+src=${^src},src-gen
+
+-generate: \
+	model/shop.ecore; \
+		generate=fennecEMF; \
+		ecore=model/shop.ecore; \
+		output=src-gen; \
+		lineEndings=lf; \
+		logfile=codegen.log
+
+-includeresource.model: model=model
+
+-buildpath: \
+	org.osgi.service.condition;version=latest
