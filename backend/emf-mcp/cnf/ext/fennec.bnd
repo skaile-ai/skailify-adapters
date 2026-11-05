@@ -12,7 +12,7 @@ javac.source: 21
 javac.target: 21
 -require-bnd: "(version>=7.2.1)"
 -jpms-module-info:
-Bundle-License: Apache-2.0;link="https://www.apache.org/licenses/LICENSE-2.0"
+Bundle-License: EPL-2.0;link="https://www.eclipse.org/legal/epl-v20.html"
 
 # Fennec comes as snapshots from Maven Central's snapshot repository. A snapshot can change under
 # a build at any time (see AGENTS.md, "Known limits").

@@ -1,7 +1,8 @@
 # AGENTS.md: integrate the Skailify EMF/MCP adapter into an OSGi backend
 
 > **Status: preliminary.** Bundle names, packages and APIs may still change. Contributed from
-> Data In Motion's accounting pilot; the final naming is to be agreed with Data In Motion.
+> Data In Motion's accounting pilot; the final naming and license are to be agreed with Data In
+> Motion.
 
 Use the names as they are now and expect a rename later; keep the integration in one place
 (run descriptor and configuration) so it is easy to follow.

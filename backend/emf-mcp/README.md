@@ -1,7 +1,8 @@
 # Skailify EMF/MCP adapter
 
 > **Status: preliminary.** Bundle names, packages and APIs may still change. Contributed from
-> Data In Motion's accounting pilot; the final naming is to be agreed with Data In Motion.
+> Data In Motion's accounting pilot; the final naming and license are to be agreed with Data In
+> Motion.
 
 Makes an EMF/OSGi backend (Eclipse Fennec) reachable for Skaile agents:
 
@@ -36,4 +37,7 @@ snapshot note in AGENTS.md.
 
 ## License
 
-The Java sources in this folder are EPL-2.0, as stated in each file's header; they come from Data In Motion's accounting pilot. Whether they move to the repository's Apache-2.0 license ([LICENSE](../../LICENSE)) is still to be agreed with Data In Motion. Build files and the Gradle wrapper are Apache-2.0.
+This folder is EPL-2.0: every source file carries a Data In Motion EPL-2.0 header
+(`SPDX-License-Identifier: EPL-2.0`, text at https://www.eclipse.org/legal/epl-v20.html). The rest
+of the repository is Apache-2.0, see [LICENSE](../../LICENSE). Relicensing this folder is pending
+Data In Motion. The Gradle wrapper scripts keep their own Apache-2.0 headers.
