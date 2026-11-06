@@ -1,0 +1,4 @@
+-fixupmessages: \
+	"jpms.jarname";is:=ignore,\
+	"No translation found";is:=ignore,\
+	"Bndtools: The .classpath";is:=ignore

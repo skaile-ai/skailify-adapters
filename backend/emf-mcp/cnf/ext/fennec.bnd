@@ -1,0 +1,37 @@
+# Eclipse Fennec workspace fragment (Gradle), modelled on eclipse-fennec/emf.odata.
+
+# fennecEMF, fennecPersistence and fennecMCP are not used as workspace libraries: each adds a
+# repository whose index names open -SNAPSHOT versions. Their content is in central.mvn (released
+# artifacts) and fennec-pinned.xml (Fennec snapshots at exact builds) instead.
+-library: \
+	fennec,\
+	fennecTest
+
+base-version: 0.1.0
+javac.source: 21
+javac.target: 21
+-require-bnd: "(version>=7.2.1)"
+-jpms-module-info:
+Bundle-License: EPL-2.0;link="https://www.eclipse.org/legal/epl-v20.html"
+
+# Released artifacts from Maven Central.
+-plugin.5.Central: \
+	aQute.bnd.repository.maven.provider.MavenBndRepository; \
+		releaseUrl=https://repo.maven.apache.org/maven2/; \
+		index=${.}/central.mvn; \
+		readOnly=true; \
+		poll.time=-1; \
+		name="Central"
+
+# Fennec has no releases yet for most of what this adapter uses. Those artifacts are pinned to
+# exact snapshot builds: fennec-pinned.xml is an OSGi repository index whose entries point at the
+# timestamped jars in Maven Central's snapshot repository, each with its SHA-256. A newer snapshot
+# never comes in by itself; Central deletes old snapshot builds after a while, then the pins must
+# move (see README.md, "Dependencies").
+-plugin.6.FennecPinned: \
+	aQute.bnd.repository.osgi.OSGiRepository; \
+		locations=${fileuri;${.}/fennec-pinned.xml}; \
+		poll.time=-1; \
+		max.stale=-1; \
+		cache=${workspace}/cnf/cache/fennec-pinned; \
+		name="Fennec (pinned snapshots)"

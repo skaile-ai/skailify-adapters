@@ -1,0 +1,31 @@
+# Generic: an app plugs in only through its EPackage, its Repository and configuration.
+Bundle-Name: Skailify - EMF Model Tools
+Bundle-Description: MCP tools over any EPackage and Fennec repository: describe_model, query, get, \
+	create, update, delete; JSON <-> EObject, filters as Fennec queries, OCL/Diagnostician validation
+
+-library: enableEMF
+
+-buildpath: \
+	de.dim.skailify.mcp;version=project,\
+	org.osgi.framework;version=latest,\
+	org.osgi.service.component;version=latest,\
+	org.osgi.service.component.annotations;version=latest,\
+	org.osgi.service.metatype.annotations;version=latest,\
+	org.osgi.annotation.bundle;version=latest,\
+	org.osgi.annotation.versioning;version=latest,\
+	org.eclipse.fennec.persistence.repository;version=latest,\
+	org.eclipse.fennec.persistence.query;version=latest,\
+	org.eclipse.fennec.query.model;version=latest,\
+	org.eclipse.fennec.expression.model;version=latest,\
+	org.eclipse.fennec.mcp.api;version=latest,\
+	io.modelcontextprotocol.sdk.mcp-core;version=latest,\
+	io.projectreactor.reactor-core;version=latest,\
+	reactive-streams;version=latest,\
+	com.fasterxml.jackson.core.jackson-annotations;version=latest
+
+-testpath: \
+	assertj-core,\
+	junit-jupiter-api;version=latest,\
+	junit-jupiter-engine;version=latest,\
+	junit-platform-commons;version=latest,\
+	org.opentest4j;version=latest
