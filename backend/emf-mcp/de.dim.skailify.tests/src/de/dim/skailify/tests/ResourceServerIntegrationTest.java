@@ -169,6 +169,7 @@ class ResourceServerIntegrationTest {
 				"auth.issuers", new String[] { issuer },
 				"auth.scopes", new String[] { READ, WRITE },
 				"tools.target", "(skailify.model=shop-auth)",
+				"write.tools", true,
 				"actions", new String[] { "{\"name\": \"app.shop.approve_order\", \"approval\": \"optional\"}" },
 				"osgi.http.whiteboard.target", "(id=" + HTTP_ID + ")"));
 		service(MCPServer.class, "(server.name=shop-auth)");

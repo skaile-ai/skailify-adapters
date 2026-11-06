@@ -205,6 +205,8 @@ token as `X-Skaile-Preview-Authorization: Bearer <token>` instead; the adapter r
 the protected resource metadata URL, and one grant per tool (kind, effect class, approval,
 scope; for change tools one entry per visible class with a `grant`). `actions` adds the app's
 `app.*` capabilities of the UI or a server-side connection. The format is a draft (`0.1-draft`).
+The catalogue lists only the tools the endpoint serves: set `"write.tools": true` here exactly
+when the `SkailifyMCPServer` has it. Off (the default), only the read tools are listed.
 
 The platform does not import this manifest yet (skaile-ai/platform#9034): discovery through it
 is future-facing, and its `approval` and `effectClass` values change nothing today. Register the

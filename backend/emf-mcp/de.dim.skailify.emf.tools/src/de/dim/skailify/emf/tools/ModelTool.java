@@ -128,7 +128,7 @@ abstract class ModelTool implements AnnotatedMCPTool {
 	}
 
 	boolean readOnly() {
-		return annotations != null && Boolean.TRUE.equals(annotations.readOnlyHint());
+		return AnnotatedMCPTool.readOnly(annotations);
 	}
 
 	/** The scope the configuration asks for this tool, or blank */

@@ -28,5 +28,5 @@
  * Upstream gap: the upstream {@code MCPTool} has no annotations (eclipse-fennec/emf.osgi-mcp#55).
  */
 @org.osgi.annotation.bundle.Export
-@org.osgi.annotation.versioning.Version("0.2.0")
+@org.osgi.annotation.versioning.Version("0.3.0")
 package de.dim.skailify.mcp;

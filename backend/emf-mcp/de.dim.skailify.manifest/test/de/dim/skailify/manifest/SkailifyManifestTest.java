@@ -98,7 +98,7 @@ class SkailifyManifestTest {
 				"{\"effectClass\": \"routine\"}", "not json", "" }, JSON);
 		assertThat(actions).extracting(ToolGrant::name).containsExactly("app.bank.confirm", "app.bank.get_view_state");
 		SkailifyManifest.Settings settings = new SkailifyManifest.Settings("bank", "Bank", "Accounts", "", "/", "/mcp",
-				true, List.of("https://id.example.org/realms/example"), List.of("bank:read"), actions);
+				true, true, List.of("https://id.example.org/realms/example"), List.of("bank:read"), actions);
 
 		Map<String, Object> document = SkailifyManifest.document(settings, "https://bank.example.org/preview/x",
 				List.of(new Tool(tool("update", AnnotatedMCPTool.effect("Bank: update", true, true)), "bank:write", NS),
@@ -135,9 +135,33 @@ class SkailifyManifestTest {
 
 	@Test
 	@SuppressWarnings("unchecked")
+	void listsOnlyTheToolsTheEndpointServes() {
+		List<Tool> tools = List.of(new Tool(tool("query", AnnotatedMCPTool.query("Query")), null, NS),
+				new Tool(tool("update", AnnotatedMCPTool.effect("Update", true, true)), null, NS),
+				new Tool(tool("plain", null), null, null),
+				new Tool(tool("unhinted", new ToolAnnotations("Unhinted", null, null, null, null, null)), null, null));
+		SkailifyManifest.Settings readOnly = new SkailifyManifest.Settings("a", "A", "", "", "/", "/mcp", false, false,
+				List.of(), List.of(), List.of(new ToolGrant("app.a.confirm", ToolGrant.EFFECT, ToolGrant.ROUTINE,
+						ToolGrant.REQUIRED, null, null, List.of())));
+		SkailifyManifest.Settings withWrites = new SkailifyManifest.Settings("a", "A", "", "", "/", "/mcp", false, true,
+				List.of(), List.of(), readOnly.actions());
+
+		// without write.tools only what declares readOnlyHint=true; app actions stay
+		List<Map<String, Object>> grants = (List<Map<String, Object>>) SkailifyManifest
+				.document(readOnly, "https://a.example.org", tools, Map.of(NS, pkg)::get).get("grants");
+		assertThat(grants).extracting(g -> g.get("name")).containsExactly("query", "app.a.confirm");
+
+		grants = (List<Map<String, Object>>) SkailifyManifest
+				.document(withWrites, "https://a.example.org", tools, Map.of(NS, pkg)::get).get("grants");
+		assertThat(grants).extracting(g -> g.get("name")).containsExactly("plain", "query", "unhinted", "update",
+				"app.a.confirm");
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
 	void saysWhenThereIsNoAuth() {
 		SkailifyManifest.Settings settings = new SkailifyManifest.Settings("a", "A", "", "", "https://ui.example.org/a",
-				"mcp", false, List.of(), List.of(), List.of());
+				"mcp", false, false, List.of(), List.of(), List.of());
 		Map<String, Object> document = SkailifyManifest.document(settings, "http://localhost:8090", List.of(), ns -> null);
 		assertThat((Map<String, Object>) document.get("auth")).containsExactly(Map.entry("type", "none"));
 		assertThat((Map<String, Object>) document.get("app")).containsEntry("embedUrl", "https://ui.example.org/a");

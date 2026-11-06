@@ -39,6 +39,15 @@ public interface AnnotatedMCPTool extends MCPTool {
 		return null;
 	}
 
+	/**
+	 * Whether annotations declare a tool that only reads: {@code readOnlyHint=true}. No
+	 * annotations, or no hint, count as a tool that changes data. The one rule for which tools an
+	 * endpoint without {@code write.tools} serves, and the manifest lists.
+	 */
+	static boolean readOnly(ToolAnnotations annotations) {
+		return annotations != null && Boolean.TRUE.equals(annotations.readOnlyHint());
+	}
+
 	/** Annotations of a tool that only reads */
 	static ToolAnnotations query(String title) {
 		return new ToolAnnotations(title, Boolean.TRUE, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE, null);

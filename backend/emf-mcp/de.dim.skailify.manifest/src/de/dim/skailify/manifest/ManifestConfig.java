@@ -39,6 +39,10 @@ public @interface ManifestConfig {
 	@AttributeDefinition(description = "Whether the MCP endpoint is an OAuth resource server (as its server's oauth.enabled)")
 	boolean oauth_enabled() default false;
 
+	@AttributeDefinition(description = "Whether the MCP endpoint serves tools that change data (as its server's write.tools). "
+			+ "Off (the default), the grant catalogue lists only tools that declare readOnlyHint=true, as the endpoint serves them")
+	boolean write_tools() default false;
+
 	@AttributeDefinition(description = "Issuer URLs tokens for the app come from")
 	String[] auth_issuers() default {};
 

@@ -46,7 +46,9 @@ import org.osgi.util.tracker.ServiceTracker;
 import io.modelcontextprotocol.client.McpClient;
 import io.modelcontextprotocol.client.McpSyncClient;
 import io.modelcontextprotocol.client.transport.HttpClientStreamableHttpTransport;
+import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.json.McpJsonMapperSupplier;
+import io.modelcontextprotocol.json.TypeRef;
 import io.modelcontextprotocol.spec.McpError;
 import io.modelcontextprotocol.spec.McpSchema.CallToolRequest;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
@@ -62,7 +64,8 @@ import de.dim.skailify.example.shop.ShopPackage;
  * The example shop model over MCP: the generic model tools on its EPackage and a file repository,
  * behind SkailifyMCPServer (OAuth off, write tools opted in) at /mcp of an HTTP instance that runs
  * under a context path, as in a Skaile preview; the same tools without the opt-in at /mcp-default;
- * the read tools alone at /mcp-read, and behind a static token at /mcp-token. Driven by the MCP SDK client over real HTTP.
+ * the read tools alone at /mcp-read, and behind a static token at /mcp-token; the manifest of the
+ * context, with and without write.tools. Driven by the MCP SDK client over real HTTP.
  */
 class ModelToolsIntegrationTest {
 
@@ -269,6 +272,52 @@ class ModelToolsIntegrationTest {
 	}
 
 	/** An unknown tool: a JSON-RPC error, or an error result */
+	// ------------------------------------------------------------------ manifest
+
+	/**
+	 * The manifest lists the tools its endpoint serves: without write.tools the three read tools,
+	 * with it all six
+	 */
+	@Test
+	void theManifestListsOnlyTheToolsServed() throws Exception {
+		ConfigurationAdmin cm = service(ConfigurationAdmin.class, null);
+		Hashtable<String, Object> properties = new Hashtable<>(Map.of(
+				"app.id", "shop",
+				"app.name", "Example Shop",
+				"tools.target", "(skailify.model=shop-it)",
+				"osgi.http.whiteboard.target", "(id=" + HTTP_ID + ")"));
+		Configuration manifest = cm.getFactoryConfiguration("SkailifyManifest", "mcpit", "?");
+		CONFIGURATIONS.add(manifest);
+		manifest.update(properties);
+		awaitManifestGrants(List.of("describe_model", "get", "query"));
+
+		properties.put("write.tools", true);
+		manifest.update(properties);
+		awaitManifestGrants(List.of("create", "delete", "describe_model", "get", "query", "update"));
+	}
+
+	/** Until /.well-known/skailify.json lists exactly these grants; the tools bind dynamically */
+	private static void awaitManifestGrants(List<String> expected) throws Exception {
+		McpJsonMapper json = service(McpJsonMapperSupplier.class, null).get();
+		URI uri = URI.create("http://127.0.0.1:" + port + CONTEXT_PATH + "/.well-known/skailify.json");
+		long deadline = System.currentTimeMillis() + 20_000;
+		List<Object> names = null;
+		while (System.currentTimeMillis() < deadline) {
+			HttpResponse<String> response = HttpClient.newHttpClient().send(HttpRequest.newBuilder(uri).GET().build(),
+					HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+			if (response.statusCode() == 200) {
+				Map<String, Object> document = json.readValue(response.body(), new TypeRef<Map<String, Object>>() {
+				});
+				names = list(document.get("grants")).stream().map(grant -> grant.get("name")).toList();
+				if (names.equals(expected)) {
+					return;
+				}
+			}
+			Thread.sleep(200);
+		}
+		assertThat(names).as("grants of the manifest").isEqualTo(expected);
+	}
+
 	private static void assertRefused(McpSyncClient client, CallToolRequest request) {
 		try {
 			CallToolResult result = client.callTool(request);

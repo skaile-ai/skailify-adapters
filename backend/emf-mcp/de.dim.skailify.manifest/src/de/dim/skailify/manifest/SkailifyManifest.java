@@ -53,7 +53,9 @@ import jakarta.servlet.http.HttpServletResponse;
  * context (under the context path, too): who the app is, the page Skaile embeds, the MCP
  * endpoint, where tokens come from, and the grant catalogue.
  * <p>
- * The catalogue lists every {@link MCPTool} the configuration selects. What a tool is comes from
+ * The catalogue lists the {@link MCPTool}s the configuration selects that the MCP endpoint serves:
+ * without {@code write.tools} (as the server's), only those that declare {@code readOnlyHint=true},
+ * by the same rule as the server ({@link AnnotatedMCPTool#readOnly}). What a tool is comes from
  * what it says about itself, nothing Skailify-specific: its {@code readOnlyHint} (a query, else
  * an effect), its service properties {@value #SCOPE_PROPERTY} (the scope it needs) and
  * {@value #EPACKAGE_PROPERTY} (the nsURI of the EPackage it changes). For an effect on an
@@ -84,7 +86,7 @@ public class SkailifyManifest {
 
 	/** What the configuration says, apart from the tools */
 	record Settings(String appId, String appName, String appDescription, String publicUrl, String embedUrl,
-			String mcpEndpoint, boolean oauth, List<String> issuers, List<String> scopes, List<ToolGrant> actions) {
+			String mcpEndpoint, boolean oauth, boolean writeTools, List<String> issuers, List<String> scopes, List<ToolGrant> actions) {
 	}
 
 	/** A tool as the manifest sees it: the service and its properties */
@@ -100,7 +102,7 @@ public class SkailifyManifest {
 	public SkailifyManifest(ManifestConfig config, BundleContext context, @Reference McpJsonMapperSupplier jsonSupplier) {
 		McpJsonMapper json = jsonSupplier.get();
 		settings = new Settings(config.app_id(), config.app_name(), config.app_description(), config.public_url(),
-				config.embed_url(), config.mcp_endpoint(), config.oauth_enabled(), nonBlank(config.auth_issuers()),
+				config.embed_url(), config.mcp_endpoint(), config.oauth_enabled(), config.write_tools(), nonBlank(config.auth_issuers()),
 				nonBlank(config.auth_scopes()), actions(config.actions(), json));
 		Dictionary<String, Object> properties = new Hashtable<>();
 		properties.put("osgi.http.whiteboard.servlet.pattern", PATH);
@@ -196,7 +198,7 @@ public class SkailifyManifest {
 		document.put("auth", auth);
 
 		List<Map<String, Object>> grants = new ArrayList<>();
-		tools.stream().map(tool -> grant(tool, ePackages)).sorted(Comparator.comparing(ToolGrant::name))
+		tools.stream().filter(tool -> settings.writeTools() || readOnly(tool.tool())).map(tool -> grant(tool, ePackages)).sorted(Comparator.comparing(ToolGrant::name))
 				.forEach(grant -> grants.add(entry(grant, "mcp")));
 		settings.actions().stream().sorted(Comparator.comparing(ToolGrant::name))
 				.forEach(grant -> grants.add(entry(grant, "app")));
@@ -212,6 +214,11 @@ public class SkailifyManifest {
 		return entry;
 	}
 
+	/** Whether a tool declares it only reads; a tool without annotations changes data */
+	static boolean readOnly(MCPTool tool) {
+		return tool instanceof AnnotatedMCPTool annotated && AnnotatedMCPTool.readOnly(annotated.getAnnotations());
+	}
+
 	/**
 	 * A query when the tool says it only reads; an effect on its EPackage, from that package's
 	 * annotations, when it names one we know; otherwise a routine effect that needs approval
@@ -219,16 +226,14 @@ public class SkailifyManifest {
 	static ToolGrant grant(Tool tool, Function<String, EPackage> ePackages) {
 		MCPTool mcpTool = tool.tool();
 		String description = mcpTool.getDescription();
-		boolean readOnly = false;
 		if (mcpTool instanceof AnnotatedMCPTool annotated) {
 			ToolAnnotations annotations = annotated.getAnnotations();
 			String title = annotated.getTitle() != null ? annotated.getTitle() : annotations != null ? annotations.title() : null;
 			if (title != null) {
 				description = title;
 			}
-			readOnly = annotations != null && Boolean.TRUE.equals(annotations.readOnlyHint());
 		}
-		if (readOnly) {
+		if (readOnly(mcpTool)) {
 			return ToolGrant.query(mcpTool.getName(), tool.scope(), description);
 		}
 		EPackage ePackage = tool.ePackage() == null ? null : ePackages.apply(tool.ePackage());

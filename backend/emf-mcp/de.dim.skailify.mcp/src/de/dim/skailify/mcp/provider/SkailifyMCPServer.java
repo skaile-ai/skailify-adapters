@@ -42,6 +42,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 import org.osgi.service.metatype.annotations.Designate;
 
+import de.dim.skailify.mcp.AnnotatedMCPTool;
 import de.dim.skailify.mcp.Caller;
 import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.json.McpJsonMapper;
@@ -250,7 +251,7 @@ public class SkailifyMCPServer extends AbstractHttpMCPServer {
 
 	/** Whether a tool declares {@code readOnlyHint=true}; no annotations count as a write tool */
 	static boolean readOnly(AsyncToolSpecification spec) {
-		return spec.tool().annotations() != null && Boolean.TRUE.equals(spec.tool().annotations().readOnlyHint());
+		return AnnotatedMCPTool.readOnly(spec.tool().annotations());
 	}
 
 	@Override
