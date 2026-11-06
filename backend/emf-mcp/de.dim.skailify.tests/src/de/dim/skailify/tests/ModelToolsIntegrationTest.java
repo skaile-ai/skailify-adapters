@@ -47,6 +47,7 @@ import io.modelcontextprotocol.client.McpClient;
 import io.modelcontextprotocol.client.McpSyncClient;
 import io.modelcontextprotocol.client.transport.HttpClientStreamableHttpTransport;
 import io.modelcontextprotocol.json.McpJsonMapperSupplier;
+import io.modelcontextprotocol.spec.McpError;
 import io.modelcontextprotocol.spec.McpSchema.CallToolRequest;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.Tool;
@@ -59,9 +60,9 @@ import de.dim.skailify.example.shop.ShopPackage;
 
 /**
  * The example shop model over MCP: the generic model tools on its EPackage and a file repository,
- * behind SkailifyMCPServer (OAuth off) at /mcp of an HTTP instance that runs under a context path,
- * as in a Skaile preview; the read tools alone at /mcp-read, and behind a static token at
- * /mcp-token. Driven by the MCP SDK client over real HTTP.
+ * behind SkailifyMCPServer (OAuth off, write tools opted in) at /mcp of an HTTP instance that runs
+ * under a context path, as in a Skaile preview; the same tools without the opt-in at /mcp-default;
+ * the read tools alone at /mcp-read, and behind a static token at /mcp-token. Driven by the MCP SDK client over real HTTP.
  */
 class ModelToolsIntegrationTest {
 
@@ -109,6 +110,15 @@ class ModelToolsIntegrationTest {
 				"osgi.http.whiteboard.target", "(id=" + HTTP_ID + ")",
 				"has.tool.capability", true,
 				"toolProviders.target", "(name=shop_it_tools)",
+				"toolProviders.cardinality.minimum", 1,
+				"write.tools", true));
+		// the same provider without the write-tools opt-in: reads only
+		configure(cm, "SkailifyMCPServer", "mcpitdefault", Map.of(
+				"server.name", "shop-it-default",
+				"osgi.http.whiteboard.servlet.pattern", "/mcp-default",
+				"osgi.http.whiteboard.target", "(id=" + HTTP_ID + ")",
+				"has.tool.capability", true,
+				"toolProviders.target", "(name=shop_it_tools)",
 				"toolProviders.cardinality.minimum", 1));
 		// the same tools, reads only, on an endpoint of their own
 		configure(cm, "SkailifyToolProvider", "mcpitread", Map.of(
@@ -141,6 +151,7 @@ class ModelToolsIntegrationTest {
 
 		service(MCPServer.class, "(server.name=shop-it)");
 		service(MCPServer.class, "(server.name=shop-it-read)");
+		service(MCPServer.class, "(server.name=shop-it-default)");
 		service(MCPServer.class, "(server.name=shop-it-token)");
 		ServiceReference<HttpServiceRuntime> runtime = reference(HttpServiceRuntime.class, "(id=" + HTTP_ID + ")");
 		port = URI.create(String.valueOf(first(runtime.getProperty(HttpServiceRuntimeConstants.HTTP_SERVICE_ENDPOINT))))
@@ -238,6 +249,32 @@ class ModelToolsIntegrationTest {
 					.satisfies(item -> assertThat(item).containsEntry("number", "2026-17"));
 		} finally {
 			reader.closeGracefully();
+		}
+	}
+
+	@Test
+	void servesNoWriteToolsWithoutTheOptIn() throws Exception {
+		McpSyncClient reader = connect("/mcp-default");
+		try {
+			assertThat(reader.listTools().tools()).extracting(Tool::name)
+					.containsExactlyInAnyOrder("describe_model", "query", "get");
+			assertRefused(reader, new CallToolRequest("create", Map.of("type", "Customer",
+					"fields", Map.of("name", "Not Created GmbH"))));
+			assertRefused(reader, new CallToolRequest("delete", Map.of("type", "Customer", "id", customer.getId())));
+			assertThat(list(structured(reader.callTool(new CallToolRequest("query",
+					Map.of("type", "Customer", "filter", Map.of("name", "Not Created GmbH"))))).get("items"))).isEmpty();
+		} finally {
+			reader.closeGracefully();
+		}
+	}
+
+	/** An unknown tool: a JSON-RPC error, or an error result */
+	private static void assertRefused(McpSyncClient client, CallToolRequest request) {
+		try {
+			CallToolResult result = client.callTool(request);
+			assertThat(result.isError()).as(request.name()).isTrue();
+		} catch (McpError e) {
+			assertThat(e.getMessage()).as(request.name()).containsIgnoringCase("unknown tool");
 		}
 	}
 

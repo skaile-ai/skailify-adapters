@@ -160,7 +160,8 @@ class ResourceServerIntegrationTest {
 				"oauth.resource", resource,
 				"oauth.authorization.servers", new String[] { issuer },
 				"oauth.scopes.supported", new String[] { READ, WRITE },
-				"oauth.scopes.required", new String[] { READ }));
+				"oauth.scopes.required", new String[] { READ },
+				"write.tools", true));
 		configure(cm, "SkailifyManifest", "mcpauth", Map.of(
 				"app.id", "shop",
 				"app.name", "Example Shop",

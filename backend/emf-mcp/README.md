@@ -8,7 +8,8 @@ Makes an EMF/OSGi backend (Eclipse Fennec) reachable for Skaile agents:
 
 - **`de.dim.skailify.emf.tools`**: generic MCP tools over any EPackage and Fennec
   repository: `describe_model`, `query`, `get`, `create`, `update`, `delete`, with structured
-  validation errors and per-call read/write scopes.
+  validation errors and per-call read/write scopes. The write tools are served only with an
+  explicit opt-in (see "Writes and consent").
 - **`de.dim.skailify.mcp`**: an MCP server component for eclipse-fennec/emf.osgi-mcp
   that can be an OAuth resource server (RFC 6750, RFC 9728 metadata) and hands the verified
   caller to the tools; tool annotations (`readOnlyHint`, `destructiveHint`, …); static-token
@@ -27,9 +28,13 @@ apply its approval cards or any user consent to MCP calls**: an agent with a wri
 data directly, as the user. The `approval` and `effectClass` values in the model's annotations and
 in the manifest are declarations only; nothing enforces them on an MCP call today.
 
-For now, expose only the read-only endpoint (`describe_model`, `query`, `get`; AGENTS.md, Step 4)
-to agents, and put writes that need consent through `app.*` actions of the UI adapter
-(`frontend/vue-tsm`), where the platform's approval applies. The platform design treats MCP as the
+So the write tools are **off by default**: an MCP server serves only tools that declare
+`readOnlyHint=true` (`describe_model`, `query`, `get`) unless its configuration sets
+`"write.tools": true`. With that opt-in on, `create`, `update` and `delete` are served as well,
+**ungoverned and your responsibility**: no Skaile approval or consent applies, and the server logs
+a WARN saying so when it activates. Expose endpoints without the opt-in to agents, and put writes
+that need consent through `app.*` actions of the UI adapter (`frontend/vue-tsm`), where the
+platform's approval applies. The platform design treats MCP as the
 read and query channel; that may change or remove the write tools here.
 
 Test support only (not part of the adapter): `de.dim.skailify.example.model` (a small

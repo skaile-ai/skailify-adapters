@@ -70,7 +70,12 @@ import jakarta.servlet.http.HttpServletRequest;
  * <li>the protected resource metadata is served at
  * {@code /.well-known/oauth-protected-resource<endpoint>} of the same HTTP context.</li>
  * </ul>
- * With OAuth off it serves exactly like upstream: static token, or loopback callers only.
+ * With OAuth off it authenticates exactly like upstream: static token, or loopback callers only.
+ * <p>
+ * Tools that change data are served only with {@code write.tools=true}. Off (the default), the
+ * endpoint lists and accepts only tools that declare {@code readOnlyHint=true}; a tool without
+ * that declaration counts as a write tool. Skaile applies no approval or consent to MCP calls, so
+ * with the opt-in on, writes over this endpoint are ungoverned, and activation logs a warning.
  * <p>
  * Upstream gap (eclipse-fennec/emf.osgi-mcp#56, #57): {@link AbstractHttpMCPServer} builds its transport
  * without a context extractor and keeps the names of the registered tools private, so
@@ -121,6 +126,10 @@ public class SkailifyMCPServer extends AbstractHttpMCPServer {
 				LOG.warning(() -> "MCP server " + config.server_name() + ": OAuth is on without "
 						+ "oauth.authorization.servers; clients cannot discover where to get a token");
 			}
+		}
+		if (config.write_tools()) {
+			LOG.warning(() -> "MCP server " + config.server_name() + ": write.tools is on; its tools that change data are "
+					+ "ungoverned (no Skaile approval or consent applies to MCP calls)");
 		}
 		initializeMCPServer();
 		toolProviders.forEach(provider -> provider.onToolsChanged(toolsChanged));
@@ -232,9 +241,16 @@ public class SkailifyMCPServer extends AbstractHttpMCPServer {
 		bearerFilter = null;
 	}
 
+	/** The tools of the providers; without {@code write.tools}, only those that declare they only read */
 	@Override
 	public List<AsyncToolSpecification> getTools() {
-		return toolProviders.stream().map(MCPToolProvider::getMCPTools).flatMap(List::stream).toList();
+		return toolProviders.stream().map(MCPToolProvider::getMCPTools).flatMap(List::stream)
+				.filter(spec -> config.write_tools() || readOnly(spec)).toList();
+	}
+
+	/** Whether a tool declares {@code readOnlyHint=true}; no annotations count as a write tool */
+	static boolean readOnly(AsyncToolSpecification spec) {
+		return spec.tool().annotations() != null && Boolean.TRUE.equals(spec.tool().annotations().readOnlyHint());
 	}
 
 	@Override

@@ -15,13 +15,19 @@ run every check, and report what you could not verify.
 **Writes and consent: read this before you expose anything.** `create`, `update` and `delete` are
 MCP tools. The Skaile platform does **not** apply its approval cards or any user consent to MCP
 calls: an agent with a write token changes data directly, as the user. The `approval` and
-`effectClass` declarations below (Step 3, Step 6) are not enforced on MCP calls. So, for now:
+`effectClass` declarations below (Step 3, Step 6) are not enforced on MCP calls. So:
 
-- Expose only the read-only endpoint (Step 4) to agents.
+- **Write tools are off by default.** A `SkailifyMCPServer` serves only tools that declare
+  `readOnlyHint=true` (`describe_model`, `query`, `get`) unless its configuration sets
+  `"write.tools": true`. Without the opt-in, `create`, `update` and `delete` are neither listed
+  nor callable (a call is refused as an unknown tool). A tool without annotations counts as a
+  write tool.
+- **With `"write.tools": true` the writes are ungoverned and your responsibility.** No Skaile
+  approval or consent applies to them; the server logs a WARN saying so when it activates. Turn
+  it on only for tests or trusted automation, and say why in the app's configuration.
+- Expose the read-only endpoint (Step 4, or any endpoint without the opt-in) to agents.
 - Put writes that need consent through `app.*` actions of the UI adapter (`frontend/vue-tsm` in
   this repository), where the platform's approval applies.
-- Keep the full endpoint (with the write tools) for tests or trusted automation only, and say so
-  in the app's configuration.
 
 The platform design treats MCP as the read and query channel. That may change or remove the
 write tools here.
@@ -82,6 +88,12 @@ Configure through Configuration Admin (a configurator JSON, `.cfg` files or code
   "toolProviders.target": "(name=app_tools)"
 }
 ```
+
+This endpoint serves the three read tools only: `write.tools` is off. To serve `create`,
+`update` and `delete` on it as well, add `"write.tools": true` to `SkailifyMCPServer~app`. Those
+writes are ungoverned and your responsibility (see "Writes and consent" above). The manifest
+(Step 6) selects tools on its own: point its `tools.target` at the read tools
+(`(&(skailify.model=app)(tool.readOnly=true))`) unless an endpoint has the opt-in.
 
 Other tool options: `tool.prefix`, `types.excluded`, `messages.annotation.source` (a class
 annotation holding a human message per constraint name), `structural.validation`,
@@ -207,9 +219,11 @@ MCP endpoint in Skaile by hand.
      `401`/`403` (static token / loopback only).
    - `curl <base>/.well-known/oauth-protected-resource/mcp` and
      `curl <base>/.well-known/skailify.json`: valid JSON with your issuer, scopes and tools.
-   - An MCP client with a valid token: `tools/list` shows the six tools with annotations;
-     `describe_model` hides what you hid; `query`, `create` with a constraint violation (structured
-     `constraint_violation`), a write with a read-only token (`insufficient_scope`).
+   - An MCP client with a valid token: `tools/list` shows the three read tools with
+     annotations, and a `create` call is refused; `describe_model` hides what you hid; `query`.
+   - Only if an endpoint has `"write.tools": true`: the WARN at activation, `tools/list` shows
+     the six tools, `create` with a constraint violation (structured `constraint_violation`), a
+     write with a read-only token (`insufficient_scope`).
    - The same through the Skaile preview URL with `X-Skaile-Preview-Authorization`.
 3. Report exactly which of these you ran and what happened.
 

@@ -16,8 +16,9 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 /**
  * The properties of the upstream {@code HttpMCPServerComponent} (a configuration moves over as
- * is) plus the OAuth resource server. OAuth is off by default: then the endpoint behaves exactly
- * like upstream (static {@code auth.token}, or loopback callers only).
+ * is) plus the OAuth resource server and the write-tools opt-in. OAuth is off by default: then the
+ * endpoint authenticates exactly like upstream (static {@code auth.token}, or loopback callers
+ * only). {@code write.tools} is off by default: then only read-only tools are served.
  */
 @ObjectClassDefinition(name = "Skailify MCP server",
 		description = "MCP server over HTTP (as HttpMCPServerComponent) that can act as an OAuth resource server")
@@ -64,6 +65,13 @@ public @interface ServerConfig {
 
 	@AttributeDefinition(description = "LDAP filter selecting the McpTokenVerifier (e.g. a JwtTokenVerifier)")
 	String verifier_target() default "(verifier.name=*)";
+
+	// ---------------------------------------------------------------- write tools
+
+	@AttributeDefinition(description = "Whether the endpoint serves tools that change data. Off by default: then "
+			+ "only tools that declare readOnlyHint=true are listed and callable. On, every selected tool is served, "
+			+ "ungoverned: no Skaile approval or consent applies to MCP calls")
+	boolean write_tools() default false;
 
 	// ---------------------------------------------------------------- OAuth resource server
 
