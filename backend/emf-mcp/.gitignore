@@ -1,0 +1,8 @@
+/.gradle/
+generated/
+build/
+bin/
+bin_test/
+/cnf/cache
+codegen.log
+codegen-*.log

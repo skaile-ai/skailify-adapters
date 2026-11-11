@@ -1,0 +1,36 @@
+-library: enableOSGi-Test
+
+-runfw: org.apache.felix.framework;version='[7.0.5,7.0.5]'
+-runee: JavaSE-21
+
+-resolve.effective: active;skip:="osgi.service"
+
+-runrequires: \
+	bnd.identity;id='de.dim.skailify.tests',\
+	bnd.identity;id='de.dim.skailify.example.model',\
+	bnd.identity;id='de.dim.skailify.testing.filerepository',\
+	bnd.identity;id='de.dim.skailify.emf.tools',\
+	bnd.identity;id='de.dim.skailify.mcp',\
+	bnd.identity;id='de.dim.skailify.manifest',\
+	bnd.identity;id='org.eclipse.fennec.mcp.http.component',\
+	bnd.identity;id='org.eclipse.fennec.mcp.auth.jwt',\
+	bnd.identity;id='io.modelcontextprotocol.sdk.mcp-json-jackson3',\
+	bnd.identity;id='org.eclipse.fennec.m2x.ocl.engine',\
+	bnd.identity;id='org.eclipse.fennec.m2x.ocl.parser',\
+	bnd.identity;id='org.eclipse.fennec.emf.osgi.component.minimal',\
+	bnd.identity;id='org.apache.felix.http.jetty12',\
+	bnd.identity;id='org.apache.aries.spifly.dynamic.bundle',\
+	bnd.identity;id='org.apache.felix.configadmin'
+
+# one emf.osgi runtime stack only; the spifly framework extension
+# cannot read Java-21 class files
+-runblacklist: \
+	bnd.identity;id='org.eclipse.fennec.emf.osgi.component',\
+	bnd.identity;id='org.eclipse.fennec.emf.osgi.component.minimal';version='[0.1.0,1.0.0)',\
+	bnd.identity;id='org.apache.aries.spifly.dynamic.framework.extension'
+
+# no default Jetty instance: the test configures one of its own, on an ephemeral port and under a
+# context path like the preview
+-runproperties: \
+	ds.loglevel=warn,\
+	org.osgi.service.http.port=-1

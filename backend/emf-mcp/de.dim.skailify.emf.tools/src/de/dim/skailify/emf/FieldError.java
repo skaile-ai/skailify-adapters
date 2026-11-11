@@ -1,0 +1,31 @@
+/**
+ * Copyright (c) 2026 Data In Motion and others.
+ * All rights reserved.
+ *
+ * This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License v2.0 which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-v20.html
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+package de.dim.skailify.emf;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+/**
+ * What is wrong with one field of a request.
+ *
+ * @param field the path of the field in the request, e.g. {@code lineItems[0].net}
+ * @param message what is wrong, for the agent to correct it
+ */
+public record FieldError(String field, String message) {
+
+	/** As a JSON-like map */
+	public Map<String, Object> toMap() {
+		Map<String, Object> map = new LinkedHashMap<>();
+		map.put("field", field);
+		map.put("message", message);
+		return map;
+	}
+}

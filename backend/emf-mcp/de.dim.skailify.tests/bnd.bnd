@@ -1,0 +1,37 @@
+# SPDX-License-Identifier: EPL-2.0
+Bundle-Name: Skailify EMF - Integration Tests
+Bundle-Description: The adapter over the example model in a real OSGi runtime: an MCP client talks to \
+	the /mcp endpoint under a context path, over a file repository; with OAuth on, against a local test \
+	issuer (JWKS served by the test, tokens minted by it).
+
+Test-Cases: ${classes;HIERARCHY_INDIRECTLY_ANNOTATED;org.junit.platform.commons.annotation.Testable;CONCRETE}
+
+-library: \
+	enableOSGi-Test,\
+	enableEMF
+
+# bundles under test on the buildpath so Gradle builds them before resolve.test/testOSGi
+-buildpath: \
+	org.osgi.framework;version=latest,\
+	org.osgi.service.cm;version=latest,\
+	org.osgi.util.tracker;version=latest,\
+	org.osgi.service.servlet;version=latest,\
+	org.osgi.dto;version=latest,\
+	de.dim.skailify.example.model;version=project,\
+	de.dim.skailify.testing.filerepository;version=project,\
+	de.dim.skailify.mcp;version=project,\
+	de.dim.skailify.emf.tools;version=project,\
+	de.dim.skailify.manifest;version=project,\
+	org.eclipse.fennec.persistence.repository;version=latest,\
+	org.eclipse.fennec.persistence.query;version=latest,\
+	org.eclipse.fennec.mcp.api;version=latest,\
+	org.eclipse.fennec.mcp.endpoint;version=latest,\
+	io.modelcontextprotocol.sdk.mcp-core;version=latest,\
+	io.projectreactor.reactor-core;version=latest,\
+	reactive-streams;version=latest,\
+	com.fasterxml.jackson.core.jackson-annotations;version=latest,\
+	com.nimbusds.nimbus-jose-jwt;version=latest,\
+	org.apache.felix.http.servlet-api;version=latest
+
+Private-Package: \
+	de.dim.skailify.tests

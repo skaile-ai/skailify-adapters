@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: EPL-2.0
+# Generic MCP extensions for eclipse-fennec/emf.osgi-mcp; parts may move upstream
+# (eclipse-fennec/emf.osgi-mcp#55-#59).
+Bundle-Name: Skailify - MCP
+Bundle-Description: MCP tools with annotations (title, readOnlyHint, destructiveHint, ...) for the \
+	eclipse-fennec/emf.osgi-mcp whiteboard: the AnnotatedMCPTool interface and a tool provider that \
+	carries the annotations into the tool list; an MCP server that is an OAuth resource server \
+	(RFC 9728 metadata, the verified caller handed to the tools). No application code
+
+-buildpath: \
+	org.osgi.framework;version=latest,\
+	org.osgi.service.component.annotations;version=latest,\
+	org.osgi.service.metatype.annotations;version=latest,\
+	org.osgi.annotation.bundle;version=latest,\
+	org.osgi.annotation.versioning;version=latest,\
+	org.osgi.namespace.implementation;version=latest,\
+	io.modelcontextprotocol.sdk.mcp-core;version=latest,\
+	io.projectreactor.reactor-core;version=latest,\
+	reactive-streams;version=latest,\
+	org.eclipse.fennec.mcp.api;version=latest,\
+	org.eclipse.fennec.mcp.endpoint;version=latest,\
+	org.apache.felix.http.servlet-api;version=latest
+
+-testpath: \
+	assertj-core,\
+	junit-jupiter-api;version=latest,\
+	junit-jupiter-engine;version=latest,\
+	junit-platform-commons;version=latest,\
+	org.opentest4j;version=latest,\
+	io.modelcontextprotocol.sdk.mcp-json-jackson3;version=latest,\
+	tools.jackson.core.jackson-core;version=latest,\
+	tools.jackson.core.jackson-databind;version=latest,\
+	com.fasterxml.jackson.core.jackson-annotations;version=latest
+

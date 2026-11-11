@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: EPL-2.0
+# A manifest describing an app for Skaile (the platform does not import it yet,
+# skaile-ai/platform#9034). Generic over the app: it plugs in through
+# configuration and the skailify EAnnotation of its EPackage.
+Bundle-Name: Skailify - Manifest
+Bundle-Description: Serves /.well-known/skailify.json: the app, its embed URL, MCP endpoint, issuers \
+	and a grant catalogue from the MCP tools, the skailify EAnnotation and configuration (draft 0.1)
+
+-library: enableEMF
+
+-buildpath: \
+	de.dim.skailify.mcp;version=project,\
+	de.dim.skailify.emf.tools;version=project,\
+	org.osgi.framework;version=latest,\
+	org.osgi.service.component.annotations;version=latest,\
+	org.osgi.service.metatype.annotations;version=latest,\
+	org.osgi.annotation.bundle;version=latest,\
+	org.osgi.annotation.versioning;version=latest,\
+	org.eclipse.fennec.mcp.api;version=latest,\
+	io.modelcontextprotocol.sdk.mcp-core;version=latest,\
+	io.projectreactor.reactor-core;version=latest,\
+	reactive-streams;version=latest,\
+	org.apache.felix.http.servlet-api;version=latest
+
+-testpath: \
+	assertj-core,\
+	junit-jupiter-api;version=latest,\
+	junit-jupiter-engine;version=latest,\
+	junit-platform-commons;version=latest,\
+	org.opentest4j;version=latest,\
+	io.modelcontextprotocol.sdk.mcp-json-jackson3;version=latest,\
+	tools.jackson.core.jackson-core;version=latest,\
+	tools.jackson.core.jackson-databind;version=latest,\
+	com.fasterxml.jackson.core.jackson-annotations;version=latest
