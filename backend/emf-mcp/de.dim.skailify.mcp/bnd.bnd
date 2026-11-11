@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: EPL-2.0
 # Generic MCP extensions for eclipse-fennec/emf.osgi-mcp; parts may move upstream
 # (eclipse-fennec/emf.osgi-mcp#55-#59).
 Bundle-Name: Skailify - MCP

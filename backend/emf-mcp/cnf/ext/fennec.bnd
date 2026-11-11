@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: EPL-2.0
 # Eclipse Fennec workspace fragment (Gradle), modelled on eclipse-fennec/emf.odata.
 
 # fennecEMF, fennecPersistence and fennecMCP are not used as workspace libraries: each adds a

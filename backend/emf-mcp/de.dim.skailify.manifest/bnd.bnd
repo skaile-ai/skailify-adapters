@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: EPL-2.0
 # A manifest describing an app for Skaile (the platform does not import it yet,
 # skaile-ai/platform#9034). Generic over the app: it plugs in through
 # configuration and the skailify EAnnotation of its EPackage.

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: EPL-2.0
 Bundle-Name: Skailify EMF - Integration Tests
 Bundle-Description: The adapter over the example model in a real OSGi runtime: an MCP client talks to \
 	the /mcp endpoint under a context path, over a file repository; with OAuth on, against a local test \

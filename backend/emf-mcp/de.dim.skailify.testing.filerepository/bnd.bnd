@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: EPL-2.0
 # TEST SUPPORT ONLY, not part of the adapter: a writable file/XMI flavour of the Fennec repository
 # facade, so the integration tests have a Repository without a database. An app brings its own.
 Bundle-Name: Skailify EMF - Test File Repository

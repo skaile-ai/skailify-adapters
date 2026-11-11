@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: EPL-2.0
 # TEST SUPPORT ONLY, not part of the adapter: a small example model the integration tests drive the
 # tools, the MCP server and the manifest with. Generated in ecore-only mode (the genmodel is derived).
 Bundle-Name: Skailify EMF - Example Model

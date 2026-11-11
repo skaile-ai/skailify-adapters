@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: EPL-2.0
 def resolveTask = tasks.named("resolve.test") {
 	outputBndrun = layout.buildDirectory.file("test.bndrun")
 }
