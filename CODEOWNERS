@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+#
+# Code owners review changes to the adapters. The app-sdk maintainers own
+# frontend/ and backend/; replace the placeholder below with their GitHub team
+# (for example @skaile-ai/app-sdk-maintainers) once it exists in the organisation.
+#
+# /frontend/  @skaile-ai/app-sdk-maintainers
+# /backend/   @skaile-ai/app-sdk-maintainers

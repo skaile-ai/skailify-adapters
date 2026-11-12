@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: Apache-2.0
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Java build output
+target/
+.gradle/
+
+# Logs and local environment
+*.log
+.env
+.env.*
+!.env.example
+
+# Editors and OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
