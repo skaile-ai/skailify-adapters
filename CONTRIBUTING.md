@@ -36,9 +36,11 @@ A pull request is merged only when every commit in it is signed off.
 
 ### Commits written by a coding agent
 
-A commit written by a coding agent is signed off like any other. The maintainer who approves the pull
-request's merge certifies it under the DCO, having reviewed the change: a person, not the agent, is
-always the one who certifies.
+A coding agent never certifies anything itself. It commits with `git commit -s` under the git identity
+of the person it works for, so the `Signed-off-by` line names that person. The certification is made by
+the maintainer who reviews the pull request and approves its merge: by approving, they certify every
+agent-written commit in it under the DCO. If the agent ran under someone other than that maintainer,
+the maintainer adds their own sign-off before merging (`git rebase --signoff origin/main`).
 
 ## License headers
 
